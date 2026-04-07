@@ -3,13 +3,14 @@
 #include <ArduinoJson.h>
 
 
-const char* ssid = "FELOMINO";
-const char* password = "SEAN_LOWE123";
+const char* ssid = "ssid";
+const char* password = "pass";
 
 void setup(){
     Serial.begin(115200);
     delay(1000);
 
+    WiFi.mode(WIFI_STA);
     WiFi.begin(ssid, password);
     Serial.println("\nConnecting....");
 
@@ -25,10 +26,24 @@ void setup(){
 
 void loop(){
     if ((Wifi.status() == WL_CONNECTED)){
-        
+        long rnd = random(1, 50);
+        HTTPClient client;
+
+        client.begin("https://zenquotes.io/api/quotes" + String (rnd));
+        int httpCode = client.GET();
+
+        if (httpCode > 0) {
+            String payload = client.getString();
+            Serial.println("\n Statuscode" + String(httpCode));
+            Serial.println(payload);
+
+        }
+        else {
+            Serial.println("Error on HTTP")
+        }
     }
     else {
-        Serial.println("Disconnected :((")
+        Serial.println("Disconnected :((");
     }
     delay(10000);
 }
