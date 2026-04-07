@@ -25,7 +25,7 @@ void setup(){
 }
 
 void loop(){
-    if ((Wifi.status() == WL_CONNECTED)){
+    if ((WiFi.status() == WL_CONNECTED)){
         long rnd = random(1, 50);
         HTTPClient client;
 
@@ -39,7 +39,7 @@ void loop(){
 
         }
         else {
-            Serial.println("Error on HTTP")
+            Serial.println("Error on HTTP");
         }
     }
     else {
