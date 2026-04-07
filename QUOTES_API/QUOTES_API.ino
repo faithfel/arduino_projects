@@ -3,6 +3,7 @@
 #include <ArduinoJson.h>
 
 
+//chnage pass below
 const char* ssid = "ssid";
 const char* password = "pass";
 
