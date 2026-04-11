@@ -2,10 +2,8 @@
     #include <HTTPClient.h>
     #include <ArduinoJson.h>
 
-
-    //chnage pass below
-    const char* ssid = "FELOMINO";
-    const char* password = "SEAN_LOWE123";
+    const char* ssid = "ssid";
+    const char* password = "pass";
 
     void setup(){
         Serial.begin(115200);
@@ -32,11 +30,20 @@ void loop() {
     int httpCode = http.GET();
     
     if (httpCode > 0) {
-      String payload = http.getString();
-      Serial.println(payload);
+      String input = http.getString();
 
+      StaticJsonDocument<512> doc;
+      JsonDocument filter;
+      filter["q"] = true;
+      const char* q = doc["q"];
+
+
+      DeserializationError error = deserializeJson(doc, input);
+
+      serializeJsonPretty(doc, Serial);
+      Serial.println(q);
     }
     http.end();
   }
-  delay(60000);
-
+  delay(30000);
+}
