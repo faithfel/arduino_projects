@@ -4,8 +4,8 @@
 
 
     //chnage pass below
-    const char* ssid = "ssid";
-    const char* password = "pass";
+    const char* ssid = "FELOMINO";
+    const char* password = "SEAN_LOWE123";
 
     void setup(){
         Serial.begin(115200);
@@ -25,26 +25,18 @@
         Serial.println(WiFi.localIP());
     }
 
-    void loop(){
-        if ((WiFi.status() == WL_CONNECTED)){
-            long rnd = random(1, 50);
-            HTTPClient client;
+void loop() {
+  if (WiFi.status() == WL_CONNECTED) {
+    HTTPClient http;
+    http.begin("https://zenquotes.io/api/random");
+    int httpCode = http.GET();
+    
+    if (httpCode > 0) {
+      String payload = http.getString();
+      Serial.println(payload);
 
-            client.begin("https://zenquotes.io/api/quotes" + String (rnd));
-            int httpCode = client.GET();
-
-            if (httpCode > 0) {
-                String payload = client.getString();
-                Serial.println("\n Statuscode" + String(httpCode));
-                Serial.println(payload);
-
-        }
-        else {
-            Serial.println("Error on HTTP");
-        }
     }
-    else {
-        Serial.println("Disconnected :((");
-    }
-    delay(10000);
-}
+    http.end();
+  }
+  delay(60000);
+
