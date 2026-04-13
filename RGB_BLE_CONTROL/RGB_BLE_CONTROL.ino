@@ -16,12 +16,28 @@
 BLECharacteristic *pTxCharacteristic;
 bool deviceConnected = false;
 
+
+void setRGB(int r, int g, int b) {
+  analogWrite(red, r);   
+  analogWrite(green, g); 
+  analogWrite(blue, b);  
+}
+
+void sendToApp(String message) {
+  if (deviceConnected) {
+    pTxCharacteristic->setValue(message.c_str());
+    pTxCharacteristic->notify();
+    Serial.print("Sent to App: "); Serial.println(message);
+  }
+}
+
 class MyServerCallbacks: public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
       deviceConnected = true;
       Serial.println(">>> Device Connected");
     };
     void onDisconnect(BLEServer* pServer) {
+      setRGB(0, 0, 0); 
       deviceConnected = false;
       Serial.println(">>> Device Disconnected. Advertising...");
       pServer->getAdvertising()->start();
@@ -31,43 +47,35 @@ class MyServerCallbacks: public BLEServerCallbacks {
 class MyCallbacks: public BLECharacteristicCallbacks {
     void onWrite(BLECharacteristic *pCharacteristic) {
       String value = pCharacteristic->getValue();
-      uint8_t* data = (uint8_t*)value.c_str();
-      size_t len = value.length();
-
-      if (len > 0) {
-        // Check if this is a "Controller" packet
-        if (data[0] == '!') {
-          if (len >= 5 && data[1] == 'C') {
-            // It's a Color Picker packet: !C [R] [G] [B] [CRC]
-            uint8_t r = data[2];
-            uint8_t g = data[3];
-            uint8_t b = data[4];
-            rgbLedWrite(RGB_PIN, r, g, b);
-            Serial.printf("[RGB Update] R:%d G:%d B:%d\n", r, g, b);
-          } 
-          else if (data[1] == 'B') {
-            // It's a Button packet: !B [Button Number] [1 for press / 0 for release] [CRC]
-            Serial.printf("[Button] ID: %c State: %c\n", data[2], data[3]);
-          }
-        } 
+      if (rxValue.length() > 0) {
+        if (rxValue.length() >= 5 && rxValue[0] == '!' && rxValue[1] == 'C') {
+            int r = (uint8_t)rxValue[2];
+            int g = (uint8_t)rxValue[3];
+            int b = (uint8_t)rxValue[4];
+            setRGB(r, g, b);
+            sendToApp("Color Set via App!"); // Send confirmation to phone
+        }
         else {
-          // It's just a normal UART text message
-          Serial.print("Message from Phone: ");
-          Serial.println(value);
+            char c = toupper(rxValue[0]);
+            if (c == 'R') { setRGB(255, 0, 0); sendToApp("LED: RED"); }
+            else if (c == 'G') { setRGB(0, 255, 0); sendToApp("LED: GREEN"); }
+            else if (c == 'B') { setRGB(0, 0, 255); sendToApp("LED: BLUE"); }
+            else if (c == 'X') { setRGB(0, 0, 0);   sendToApp("LED: OFF"); }
         }
       }
     }
 };
 
+
+
 void setup() {
   Serial.begin(115200);
-  
-  // S3-Specific: Wait for Serial Monitor to catch up
-  unsigned long start = millis();
-  while (!Serial && millis() - start < 5000);
 
-  // Initialize RGB LED
-  rgbLedWrite(RGB_PIN, 0, 0, 0);
+  pinMode(red, OUTPUT);
+  pinMode(green, OUTPUT);
+  pinMode(blue, OUTPUT);
+  setRGB(0, 0, 0);
+  
 
   BLEDevice::init("hehe");
   BLEServer *pServer = BLEDevice::createServer();
@@ -95,14 +103,26 @@ void setup() {
 }
 
 void loop() {
-  // Bidirectional UART: Computer -> Phone
+  
+  setRGB(0, 0, 0);
+
   if (Serial.available()) {
-    String msg = Serial.readStringUntil('\n');
-    if (deviceConnected) {
-      pTxCharacteristic->setValue(msg.c_str());
-      pTxCharacteristic->notify();
-      Serial.println("Sent to phone: " + msg);
+    char c = toupper(Serial.read());
+    if (c == 'red') 
+    { 
+      setRGB(255, 0, 0); 
     }
+    else if (c == 'green') 
+    { 
+      setRGB(0, 255, 0); 
+    }
+    else if (c == 'blue') { 
+      setRGB(0, 0, 255); 
+    }
+    else if (c == 'off') { 
+      setRGB(0, 0, 0); 
+      }
+    while(Serial.available() > 0) Serial.read(); 
   }
-  delay(10);
+  yield();
 }
