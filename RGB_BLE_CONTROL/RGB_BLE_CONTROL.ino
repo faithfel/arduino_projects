@@ -4,7 +4,9 @@
 #include <BLE2902.h>
 
 // Built-in RGB LED for most S3 DevKits is GPIO 48
-#define RGB_PIN 48
+#define red 5
+#define blue 6
+#define green 7
 
 // Nordic UART UUIDs (Required by Bluefruit Connect)
 #define SERVICE_UUID           "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
@@ -67,7 +69,7 @@ void setup() {
   // Initialize RGB LED
   rgbLedWrite(RGB_PIN, 0, 0, 0);
 
-  BLEDevice::init("S3-UART-RGB-Combo");
+  BLEDevice::init("hehe");
   BLEServer *pServer = BLEDevice::createServer();
   pServer->setCallbacks(new MyServerCallbacks());
 
