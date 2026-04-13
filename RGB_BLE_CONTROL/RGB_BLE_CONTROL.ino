@@ -31,7 +31,7 @@ void sendToApp(String message) {
   }
 }
 
-class MyServerCallbacks: public BLEServerCallbacks {
+class MyCallbacks: public BLECharacteristicCallbacks {
     void onConnect(BLEServer* pServer) {
       deviceConnected = true;
       Serial.println(">>> Device Connected");
@@ -49,8 +49,7 @@ class MyCallbacks: public BLECharacteristicCallbacks {
       String value = pCharacteristic->getValue();
       uint8_t* data = (uint8_t*)value.c_str();
       size_t len = value.length();
-
-
+      
       if (len > 0) {
         // Check if this is a "Controller" packet
         if (data[0] == '!') {
@@ -135,4 +134,4 @@ void loop() {
   }
   yield();
 }
-};
+}
