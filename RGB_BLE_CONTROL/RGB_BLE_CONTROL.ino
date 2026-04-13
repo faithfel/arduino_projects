@@ -47,25 +47,30 @@ class MyServerCallbacks: public BLEServerCallbacks {
 class MyCallbacks: public BLECharacteristicCallbacks {
     void onWrite(BLECharacteristic *pCharacteristic) {
       String value = pCharacteristic->getValue();
-      if (rxValue.length() > 0) {
-        if (rxValue.length() >= 5 && rxValue[0] == '!' && rxValue[1] == 'C') {
-            int r = (uint8_t)rxValue[2];
-            int g = (uint8_t)rxValue[3];
-            int b = (uint8_t)rxValue[4];
+      if (len > 0) {
+        // Check if this is a "Controller" packet
+        if (data[0] == '!') {
+          if (len >= 5 && data[1] == 'C') {
+            uint8_t r = data[2];
+            uint8_t g = data[3];
+            uint8_t b = data[4];
+
             setRGB(r, g, b);
-            sendToApp("Color Set via App!"); // Send confirmation to phone
+
+            Serial.printf("[RGB Update] R:%d G:%d B:%d\n", r, g, b);
         }
+          else if (data[1] == 'B') {
+            // It's a Button packet: !B [Button Number] [1 for press / 0 for release] [CRC]
+            Serial.printf("[Button] ID: %c State: %c\n", data[2], data[3]);
+          }
+        } 
         else {
-            char c = toupper(rxValue[0]);
-            if (c == 'R') { setRGB(255, 0, 0); sendToApp("LED: RED"); }
-            else if (c == 'G') { setRGB(0, 255, 0); sendToApp("LED: GREEN"); }
-            else if (c == 'B') { setRGB(0, 0, 255); sendToApp("LED: BLUE"); }
-            else if (c == 'X') { setRGB(0, 0, 0);   sendToApp("LED: OFF"); }
+          // It's just a normal UART text message
+          Serial.print("Message from Phone: ");
+          Serial.println(value);
         }
       }
-    }
-};
-
+    };
 
 
 void setup() {
@@ -125,4 +130,5 @@ void loop() {
     while(Serial.available() > 0) Serial.read(); 
   }
   yield();
+}
 }
