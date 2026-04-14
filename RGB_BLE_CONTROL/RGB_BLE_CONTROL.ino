@@ -16,7 +16,6 @@
 BLECharacteristic *pTxCharacteristic;
 bool deviceConnected = false;
 
-
 void setRGB(int r, int g, int b) {
   analogWrite(red, r);   
   analogWrite(green, g); 
@@ -31,18 +30,20 @@ void sendToApp(String message) {
   }
 }
 
-class MyCallbacks: public BLECharacteristicCallbacks {
+class MyServerCallbacks: public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
       deviceConnected = true;
       Serial.println(">>> Device Connected");
+      setRGB(0, 0, 0);
+  
     };
     void onDisconnect(BLEServer* pServer) {
-      setRGB(0, 0, 0); 
       deviceConnected = false;
       Serial.println(">>> Device Disconnected. Advertising...");
       pServer->getAdvertising()->start();
     }
 };
+
 
 class MyCallbacks: public BLECharacteristicCallbacks {
     void onWrite(BLECharacteristic *pCharacteristic) {
@@ -73,11 +74,12 @@ class MyCallbacks: public BLECharacteristicCallbacks {
           Serial.println(value);
         }
       }
+    }
     };
 
 
-void setup() {
-  Serial.begin(115200);
+void setup () {
+ Serial.begin(115200);
 
   pinMode(red, OUTPUT);
   pinMode(green, OUTPUT);
@@ -110,8 +112,8 @@ void setup() {
   Serial.println("System Online. You can use UART or Controller in Bluefruit App.");
 }
 
-void loop() {
-  
+
+void loop () {
   setRGB(0, 0, 0);
 
   if (Serial.available()) {
@@ -133,5 +135,5 @@ void loop() {
     while(Serial.available() > 0) Serial.read(); 
   }
   yield();
-}
-}
+
+};
