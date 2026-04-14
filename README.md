@@ -13,4 +13,10 @@ An Arduino Project used to display motivational quotes from an API
 Zen Quotes API:
 https://zenquotes.io
 
+### Required:
+In order to for ESP32C3 to deserialize the API input `Arduino Json` library is required.
+Go to the Arduino IDE Libraries Tab and download this library:
+
+![arduinojson](images/arduinojson.png)
+
 ## BLE RBG COLOR PICKER CONTROL (Esp32C3)
