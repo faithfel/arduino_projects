@@ -34,7 +34,7 @@ class MyServerCallbacks: public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
       deviceConnected = true;
       Serial.println(">>> Device Connected");
-      setRGB(0, 0, 0);
+
   
     };
     void onDisconnect(BLEServer* pServer) {
@@ -84,7 +84,7 @@ void setup () {
   pinMode(red, OUTPUT);
   pinMode(green, OUTPUT);
   pinMode(blue, OUTPUT);
-  setRGB(0, 0, 0);
+
   
 
   BLEDevice::init("hehe");
