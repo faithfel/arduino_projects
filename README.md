@@ -21,3 +21,4 @@ Go to the Arduino IDE Libraries Tab and download this library:
 ![arduinojson](images/arduinojson.png)
 
 ## BLE RBG COLOR PICKER CONTROL (Esp32C3)
+![rgb wiring](images/rbgwiring.png)
