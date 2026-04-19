@@ -114,7 +114,7 @@ void setup () {
 
 
 void loop () {
-  setRGB(0, 0, 0);
+  
 
   if (Serial.available()) {
     char c = toupper(Serial.read());
