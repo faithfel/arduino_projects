@@ -1,4 +1,5 @@
 # Arduino Esp32C3 Projects
+A collection of Ardiuno ESP32C3 Project. Assign to us in my 2nd year of college. This repo has a few different types of straightforward IOT Devices.
 
 ### Table of contents
 
